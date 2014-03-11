@@ -39,7 +39,7 @@ describe "UserPages" do
       end
 
       it "should create a user" do
-        expect { click_botton submit }.to change(User, :count).by(1)
+        expect { click_button submit }.to change(User, :count).by(1)
       end
     end
   end
