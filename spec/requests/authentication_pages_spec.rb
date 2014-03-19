@@ -14,9 +14,10 @@ describe "Authentication" do
 
   describe "signin" do
     before { visit signin_path }
-
+    
     describe "with invalid information" do
-      before { click_button "Sign in"}
+      # before { click_button "Sign in"} # Commented out after ex. 4 in chapter 9
+      before { sign_in User.new}         # Added after ex. 4 in chapter 9
 
       it { should have_title('Sign in')}
       it { should have_selector('div.alert.alert-error') }
@@ -40,6 +41,7 @@ describe "Authentication" do
 
       describe "followed by signout" do
         before { click_link "Sign out" }
+
         it { should have_link('Sign in')}
         it { should_not have_link('Profile') }
         it { should_not have_link('Settings') }
@@ -77,7 +79,7 @@ describe "Authentication" do
 
         describe "submitting to the update action" do
           before { patch user_path(user) }
-          specify {expect(response).to redirect_to(signin_path) }
+          specify { expect(response).to redirect_to(signin_path) }
         end
 
         describe "visiting the user index" do
@@ -93,7 +95,7 @@ describe "Authentication" do
       before { sign_in user, no_capybara: true }
 
       describe "submitting a GET request to the Users#edit action" do
-        before {get edit_user_path(wrong_user) }
+        before { get edit_user_path(wrong_user) }
         specify { expect user_path(wrong_user) }
         specify { expect(response).to redirect_to(root_url) }
       end
