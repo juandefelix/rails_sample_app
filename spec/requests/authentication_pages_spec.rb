@@ -14,9 +14,10 @@ describe "Authentication" do
 
   describe "signin" do
     before { visit signin_path }
-
+    
     describe "with invalid information" do
-      before { click_button "Sign in"}
+      # before { click_button "Sign in"} # Commented out after ex. 4 in chapter 9
+      before { sign_in User.new}         # Added after ex. 4 in chapter 9
 
       it { should have_title('Sign in')}
       it { should have_selector('div.alert.alert-error') }
@@ -38,8 +39,15 @@ describe "Authentication" do
       it { should have_link('Sign out',    href: signout_path) }
       it { should_not have_link('Sign in', href: signin_path) }
 
+      describe "followed by signup" do
+        # visit signup_path
+        # puts "Hi"
+        # # it { should }
+      end
+
       describe "followed by signout" do
         before { click_link "Sign out" }
+
         it { should have_link('Sign in')}
         it { should_not have_link('Profile') }
         it { should_not have_link('Settings') }
@@ -51,6 +59,24 @@ describe "Authentication" do
 
     describe "for non-signed-in users" do
       let(:user) { FactoryGirl.create(:user) }
+
+      describe "in the Users controller" do
+
+        describe "visiting the edit page" do
+          before { visit edit_user_path(user) }
+          it { should have_title('Sign in') }
+        end
+
+        describe "submitting to the update action" do
+          before { patch user_path(user) }
+          specify { expect(response).to redirect_to(signin_path) }
+        end
+
+        describe "visiting the user index" do
+          before { visit users_path }
+          it { should have_title('Sign in') }
+        end
+      end # end 'in the users controller'
 
       describe "when attempting to visit a protected page" do
         before do 
@@ -65,26 +91,22 @@ describe "Authentication" do
           it "should render the desired protected page" do
             expect(page).to have_title('Edit User')
           end
-        end
-      end
 
-      describe "in the Users controller" do
+          describe "when signing in again" do
+            before do
+              click_link "Sign out"
+              visit signin_path
+              fill_in "Email",    with: user.email
+              fill_in "Password", with: user.password
+              click_button "Sign in"
+            end
 
-        describe "visiting the edit page" do
-          before { visit edit_user_path(user) }
-          it { should have_title('Sign in') }
-        end
-
-        describe "submitting to the update action" do
-          before { patch user_path(user) }
-          specify {expect(response).to redirect_to(signin_path) }
-        end
-
-        describe "visiting the user index" do
-          before { visit users_path }
-          it { should have_title('Sign in') }
-        end
-      end # end 'in the users controller'
+            it "should render the default (profile) page" do
+              expect(page). to have_title(user.name)
+            end # end 'it'
+          end # end when 'signing in again'
+        end # end "after signing"
+      end # end 'when attemptingh'
     end # end 'for non-signed...'
 
     describe "as wrong user" do
@@ -93,7 +115,7 @@ describe "Authentication" do
       before { sign_in user, no_capybara: true }
 
       describe "submitting a GET request to the Users#edit action" do
-        before {get edit_user_path(wrong_user) }
+        before { get edit_user_path(wrong_user) }
         specify { expect user_path(wrong_user) }
         specify { expect(response).to redirect_to(root_url) }
       end
