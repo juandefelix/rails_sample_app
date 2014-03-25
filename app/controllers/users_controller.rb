@@ -1,7 +1,7 @@
 class UsersController < ApplicationController
-  before_action :signed_in_user, only: [:index, :edit, :update]
-  before_action :correct_user,   only: [:edit, :update]
-  before_action :admin_user,     only: :destroy
+  before_action :signed_in_user, only: [:index, :edit, :update] # ========================================== #
+  before_action :correct_user,   only: [:edit, :update]         # I NEED TO TAKE A LOOK AT THE BEFORE_ACTION #
+  before_action :admin_user,     only: :destroy                 # ========================================== #
     
   def index
     @users = User.paginate(page: params[:page])
@@ -9,6 +9,9 @@ class UsersController < ApplicationController
 
   def show
     @user = User.find(params[:id])
+    @microposts = @user.microposts.paginate(page: params[:page]) # params[:page] is the number of a page. The paginate method
+                                                                 # will return the microposts correspondent to that 
+                                                                 # page: 1-30 (1st page), 31-60 (2nd page), etc...
   end
 
   def new
@@ -53,12 +56,6 @@ class UsersController < ApplicationController
 
     # before filters
 
-    def signed_in_user
-      unless signed_in?
-        store_location
-        redirect_to signin_url, notice: "Please sign in."
-      end
-    end
 
     def correct_user
       @user = User.find(params[:id])

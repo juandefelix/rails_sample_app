@@ -1,4 +1,5 @@
 class User < ActiveRecord::Base
+  has_many :microposts, dependent: :destroy  # the microposts will be destoyed when the user is destroyed
   before_save { self.email = email.downcase }
   before_create :create_remember_token
 
@@ -19,6 +20,10 @@ class User < ActiveRecord::Base
     Digest::SHA1.hexdigest(token.to_s)    # Hashes a token
   end
 
+  def feed
+    Micropost.where("user_id = ?", id)
+  end
+  
   private
 
     # Assigns a generated and hashed token to the User.remember_token
