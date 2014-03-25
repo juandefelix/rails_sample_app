@@ -1,5 +1,5 @@
 class User < ActiveRecord::Base
-  has_many :microposts
+  has_many :microposts, dependent: :destroy  # the microposts will be destoyed when the user is destroyed
   before_save { self.email = email.downcase }
   before_create :create_remember_token
 
