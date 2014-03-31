@@ -1,7 +1,13 @@
 SampleApp::Application.routes.draw do
-  resources :users
-  resources :sessions, only: [:new, :create, :destroy]
-  resources :microposts, only: [:create, :destroy]
+  resources :users do
+    member do                         # 'member' is a reserved word for 'resources'
+      get :following, :followers      # this will create the routes 'user/1/following'
+                                      # and 'user/1/followers'
+    end
+  end
+  resources :sessions,      only: [:new, :create, :destroy]
+  resources :microposts,    only: [:create, :destroy]
+  resources :relationships, only: [:create, :destroy]
 
   root 'static_pages#home'
 
