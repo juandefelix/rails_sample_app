@@ -84,7 +84,7 @@ describe "Authentication" do
 
         describe "visiting the followers page" do
           before { visit followers_user_path(user) }
-          it { should have_title('Sing in') }
+          it { should have_title('Sign in') }
         end
       end # end 'in the users controller'
 
@@ -97,6 +97,18 @@ describe "Authentication" do
 
         describe "submitting to the destroy action" do
           before { delete micropost_path(FactoryGirl.create(:micropost)) }
+          specify { expect(response).to redirect_to(signin_path) }
+        end
+      end
+
+      describe "in the Relationships controlloer" do
+        describe "submitting to the create action" do
+          before { post relationships_path}
+          specify { expect(response).to redirect_to(signin_path) }
+        end
+
+        describe "submitting to the destroy action" do
+          before { delete relationship_path(1) }
           specify { expect(response).to redirect_to(signin_path) }
         end
       end
